@@ -7,16 +7,12 @@ from FeatureExtract.trainmodel import trainingmodel
 import numpy as np
 
 
-def extractfeature(preprocessedfile, labelfile, classlen, glovefile, uniquetokenfile, modelpath, featurefilepath,maxsequence,
-                  max_words,
-                  embed_dim,
-                  valid_split):
-
-    trainingmodel(preprocessedfile, labelfile, classlen, glovefile, uniquetokenfile, modelpath, maxsequence,
-                  max_words,
-                  embed_dim,
-                  valid_split)
-
+def extractfeature(preprocessedfile,
+                   featurefilepath,
+                   modelpath,
+                   maxsequence,
+                   max_words,
+                   embed_dim):
 
     data = []
     # get files
@@ -36,8 +32,6 @@ def extractfeature(preprocessedfile, labelfile, classlen, glovefile, uniquetoken
 
     print("Extracting features...")
     model = load_model(modelpath)
-    intermediate_layer_model = Model(inputs=model.input, outputs=model.get_layer('dense_2').output)
-    intermediate_layer_model.summary()
-    feauture_engg_data = intermediate_layer_model.predict(data)
-    np.save(featurefilepath, feauture_engg_data)
+    features = model.predict(data, verbose=1)
+    np.save(featurefilepath, features)
     print("Feature extracted.")

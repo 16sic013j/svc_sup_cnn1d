@@ -6,6 +6,7 @@ from Clustering.gcndcluster import generate_cluster, save_proposals
 from Clustering.similarysearch import getnormlize_features
 from Evaluation.evaluate import evaluation
 from FeatureExtract.featureextract import extractfeature
+from FeatureExtract.trainmodel import trainingmodel
 from Preprocess.preprocess import preprocess, label2file
 from utils import writepred, ifexitdir, np
 
@@ -18,19 +19,25 @@ dataset_dir = "Dataset"
 # labelfile_path = dataset_dir + "labelfile.txt"
 # data_preprocessed_file = "dataset_dir + "raw_data.txt"
 
-labelfile_path = "Preprocess/labelfile.txt"
-data_preprocessed_file = "Preprocess/data_preprocessed.txt"
-svertex_predlabelfile = "Clustering/proposal/svertex_predlabelfile.txt"
-knn_predlabelfile = "Baseline/knn_predlabels.txt"
-dbscan_predlabelfile = "Baseline/dbscan_predlabels.txt"
+labelfile_train = "Preprocess/labelfile_train.txt"
+preprocessfile_train = "Preprocess/preprocessfile_train.txt"
+
+labelfile_test = "Preprocess/labelfile_test.txt"
+preprocessfile_test = "Preprocess/preprocessfile_test.txt"
+
 modelpath = feature_dir + '/model.bin'
-featurefilepath = feature_dir + '/featurefile.npy'
 uniquetokenfile = feature_dir + "/unniquetokens.txt"
 glovefile = feature_dir + '/glove.6B.100d.txt'
 
+featurefilepath = feature_dir + '/featurefile.npy'
+
+svertex_predlabelfile = "Clustering/proposal/svertex_predlabelfile.txt"
+knn_predlabelfile = "Baseline/knn_predlabels.txt"
+dbscan_predlabelfile = "Baseline/dbscan_predlabels.txt"
+
 # Reset all generated directory and files for retests
 dirarr = [knn_dir, proposal_dir]
-filearr = [modelpath, featurefilepath]
+filearr = ["featurefilepath"]
 ifexitdir(dirarr, filearr)
 
 # # Gather dataset and add to memory
@@ -38,27 +45,48 @@ ifexitdir(dirarr, filearr)
 # data_raw = newsgroups_train.data
 # labels = newsgroups_train.target
 # classnames = newsgroups_train.target_names
-
+#
 # # Preprocess datasets
-# preprocess(data_raw, data_preprocessed_file)
-# label2file(labels, labelfile_path)
-
-# # Extract feature
+# preprocess(data_raw, preprocessfile_train)
+# label2file(labels, labelfile_train)
+#
+# # Train model
 # classlen = len(classnames)
-# MAX_SEQUENCE_LENGTH = 1000
-# MAX_NB_WORDS = 20000
-# EMBEDDING_DIM = 100
-# VALIDATION_SPLIT = 0.2
-# extractfeature(data_preprocessed_file,
-#                labelfile_path,
-#                classlen,glovefile,
-#                uniquetokenfile,
-#                modelpath,
-#                featurefilepath,
-#                MAX_SEQUENCE_LENGTH,
-#                MAX_NB_WORDS,
-#                EMBEDDING_DIM,
-#                VALIDATION_SPLIT)
+# maxsequence = 1000
+# max_words = 20000
+# embed_dim = 100
+# valid_split = 0.2
+# trainingmodel(preprocessfile_train,
+#               labelfile_train,
+#               classlen,
+#               glovefile,
+#               uniquetokenfile,
+#               modelpath,
+#               maxsequence,
+#               max_words,
+#               embed_dim,
+#               valid_split)
+
+# get test datasets
+newsgroups_train = fetch_20newsgroups(subset='test', remove=('headers', 'footers', 'quotes'))
+data_raw = newsgroups_train.data
+labels = newsgroups_train.target
+classnames = newsgroups_train.target_names
+
+# Preprocess datasets
+preprocess(data_raw, preprocessfile_test)
+label2file(labels, labelfile_test)
+
+# Extract feature
+maxsequence = 1000
+max_words = 20000
+embed_dim = 100
+extractfeature(preprocessfile_test,
+                featurefilepath,
+                modelpath,
+                maxsequence,
+                max_words,
+                embed_dim)
 
 # Cluster
 knn_method = 'faiss'
@@ -82,14 +110,14 @@ clustgen = generate_cluster(proposal_dir,
 save_proposals(clustgen, faiss_knns, proposal_dir)
 
 # Evaluate
-evaluation(labelfile_path, svertex_predlabelfile)
+evaluation(labelfile_test, svertex_predlabelfile)
 print('---------------------------\n')
 
 # Kmeans Test
 n_clusters = 50
 kmeans_feat = kmeans(features, n_clusters)
 writepred(kmeans_feat, knn_predlabelfile)
-evaluation(labelfile_path, knn_predlabelfile)
+evaluation(labelfile_test, knn_predlabelfile)
 print('---------------------------\n')
 
 # Dbscan test
@@ -97,4 +125,4 @@ eps = 0.5
 min_samples = 100
 dbscan_feat = dbscan(features, eps, min_samples)
 writepred(dbscan_feat, dbscan_predlabelfile)
-evaluation(labelfile_path, dbscan_predlabelfile)
+evaluation(labelfile_test, dbscan_predlabelfile)
