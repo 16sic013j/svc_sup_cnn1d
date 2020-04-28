@@ -67,37 +67,37 @@ ifexitdir(dirarr, filearr)
 #               embed_dim,
 #               valid_split)
 
-# get test datasets
-newsgroups_train = fetch_20newsgroups(subset='test', remove=('headers', 'footers', 'quotes'))
-data_raw = newsgroups_train.data
-labels = newsgroups_train.target
-classnames = newsgroups_train.target_names
-
-# Preprocess datasets
-preprocess(data_raw, preprocessfile_test)
-label2file(labels, labelfile_test)
-
-# Extract feature
-maxsequence = 1000
-max_words = 20000
-embed_dim = 100
-extractfeature(preprocessfile_test,
-                featurefilepath,
-                modelpath,
-                maxsequence,
-                max_words,
-                embed_dim)
+# # get test datasets
+# newsgroups_train = fetch_20newsgroups(subset='test', remove=('headers', 'footers', 'quotes'))
+# data_raw = newsgroups_train.data
+# labels = newsgroups_train.target
+# classnames = newsgroups_train.target_names
+#
+# # Preprocess datasets
+# preprocess(data_raw, preprocessfile_test)
+# label2file(labels, labelfile_test)
+#
+# # Extract feature
+# maxsequence = 1000
+# max_words = 200
+# extractfeature(preprocessfile_test,
+#                 featurefilepath,
+#                 modelpath,
+#                 maxsequence,
+#                 max_words)
 
 # Cluster
 knn_method = 'faiss'
 k_neighbour = 10
-min_size = 20
-th_knn = 0.6
-th_step = 0.01
-max_iter = 100
-max_size = 1000
+min_size = 2
+th_knn = 0.09 # edges of knns below this value are discarded
+th_step = 0.01 # steps to increment to gather all edge conectivity with the edge threshold(th_knn)
+max_iter = 100 # iteration of the proposal generation function
+max_size = 1000 # max size of super vertices
 features = np.load(featurefilepath)
+print(features.shape)
 faiss_knns = build_faiss_knns(features, knn_dir, knn_method, k_neighbour)
+
 clustgen = generate_cluster(proposal_dir,
                             svertex_predlabelfile,
                             faiss_knns,
@@ -107,6 +107,7 @@ clustgen = generate_cluster(proposal_dir,
                             max_size,
                             min_size,
                             max_iter)
+
 save_proposals(clustgen, faiss_knns, proposal_dir)
 
 # Evaluate

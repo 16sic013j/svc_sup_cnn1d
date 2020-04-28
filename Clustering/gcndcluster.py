@@ -90,8 +90,8 @@ def generate_cluster(proposal_dir, porposal_label_path, faiss_knns, k_neighbour,
     if not os.path.isfile(porposal_label_path):
         with Timer('build super vertices'):
 
-            pairs, scores = filter_knns(faiss_knns, k_neighbour, th_knn)
-            comps = graph_clustering_dynamic_th(pairs, scores, max_size, th_step, max_iter=max_iter)
+            pairs, scores = filter_knns(faiss_knns, k_neighbour, th_knn) # Prune edge, filter out edges lower than th_knn
+            comps = graph_clustering_dynamic_th(pairs, scores, max_size, th_step, max_iter=max_iter) #super vertex generation
             clusters = [sorted([n.name for n in c]) for c in comps]
 
         with Timer('dump clustering to {}'.format(porposal_label_path)):
@@ -127,3 +127,5 @@ def save_proposals(clusters, knns, proposal_dir, force=True):
         nodes = list(nodes)
         dump_data(opath_node, data=nodes, force=force)
         dump_data(opath_edge, data=edges, force=force)
+
+

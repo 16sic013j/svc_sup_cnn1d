@@ -11,8 +11,7 @@ def extractfeature(preprocessedfile,
                    featurefilepath,
                    modelpath,
                    maxsequence,
-                   max_words,
-                   embed_dim):
+                   max_words):
 
     data = []
     # get files
@@ -20,6 +19,7 @@ def extractfeature(preprocessedfile,
     for line in preprocessread.readlines():
         data.append(line)
 
+    print(len(data))
     print("tokenising..")
     tokenizer = Tokenizer(num_words=max_words)
     tokenizer.fit_on_texts(data)
