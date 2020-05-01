@@ -6,19 +6,14 @@ import re
 def normalize_text(text):
     # Converting to Lowercase
     document = text.strip().lower()
-
     # remove all single characters
     document = re.sub(r'\s+[a-zA-Z]\s+', ' ', document)
-
     # Remove all digits
     document = re.sub(r'\b\d+\b', '', document)
-
     # Remove all the special characters
     document = re.sub(r'[ ](?=[ ])|[^-_,A-Za-z0-9 ]+', ' ', document)
-
     # Remove spaces
     document = re.sub(r'^\s+|\s+$|\s+(?=\s)', ' ', document)
-
     # Remove spaces
     document = re.sub(r'^\s+|\s+$|\s+(?=\s)', ' ', document)
 

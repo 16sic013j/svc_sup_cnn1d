@@ -40,51 +40,51 @@ dirarr = [knn_dir, proposal_dir]
 filearr = ["featurefilepath"]
 ifexitdir(dirarr, filearr)
 
-# # Gather dataset and add to memory
-# newsgroups_train = fetch_20newsgroups(subset='train', remove=('headers', 'footers', 'quotes'))
-# data_raw = newsgroups_train.data
-# labels = newsgroups_train.target
-# classnames = newsgroups_train.target_names
-#
-# # Preprocess datasets
-# preprocess(data_raw, preprocessfile_train)
-# label2file(labels, labelfile_train)
-#
-# # Train model
-# classlen = len(classnames)
-# maxsequence = 1000
-# max_words = 20000
-# embed_dim = 100
-# valid_split = 0.2
-# trainingmodel(preprocessfile_train,
-#               labelfile_train,
-#               classlen,
-#               glovefile,
-#               uniquetokenfile,
-#               modelpath,
-#               maxsequence,
-#               max_words,
-#               embed_dim,
-#               valid_split)
+# Gather dataset and add to memory
+newsgroups_train = fetch_20newsgroups(subset='train', remove=('headers', 'footers', 'quotes'))
+data_raw = newsgroups_train.data
+labels = newsgroups_train.target
+classnames = newsgroups_train.target_names
 
-# # get test datasets
-# newsgroups_train = fetch_20newsgroups(subset='test', remove=('headers', 'footers', 'quotes'))
-# data_raw = newsgroups_train.data
-# labels = newsgroups_train.target
-# classnames = newsgroups_train.target_names
-#
-# # Preprocess datasets
-# preprocess(data_raw, preprocessfile_test)
-# label2file(labels, labelfile_test)
-#
-# # Extract feature
-# maxsequence = 1000
-# max_words = 200
-# extractfeature(preprocessfile_test,
-#                 featurefilepath,
-#                 modelpath,
-#                 maxsequence,
-#                 max_words)
+# Preprocess datasets
+preprocess(data_raw, preprocessfile_train)
+label2file(labels, labelfile_train)
+
+# Train model
+classlen = len(classnames)
+maxsequence = 1000
+max_words = 20000
+embed_dim = 100
+valid_split = 0.2
+trainingmodel(preprocessfile_train,
+              labelfile_train,
+              classlen,
+              glovefile,
+              uniquetokenfile,
+              modelpath,
+              maxsequence,
+              max_words,
+              embed_dim,
+              valid_split)
+
+# get test datasets
+newsgroups_train = fetch_20newsgroups(subset='test', remove=('headers', 'footers', 'quotes'))
+data_raw = newsgroups_train.data
+labels = newsgroups_train.target
+classnames = newsgroups_train.target_names
+
+# Preprocess datasets
+preprocess(data_raw, preprocessfile_test)
+label2file(labels, labelfile_test)
+
+# Extract feature
+maxsequence = 1000
+max_words = 200
+extractfeature(preprocessfile_test,
+                featurefilepath,
+                modelpath,
+                maxsequence,
+                max_words)
 
 # Cluster
 knn_method = 'faiss'

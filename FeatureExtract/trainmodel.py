@@ -35,6 +35,7 @@ def trainingmodel(preprocessedfile,
     for line in labelread.readlines():
         labelarr.append(line)
 
+
     print("tokenising..")
     tokenizer = Tokenizer(num_words=max_words)
     tokenizer.fit_on_texts(preprocessed_arr)

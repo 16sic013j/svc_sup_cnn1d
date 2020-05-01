@@ -2,6 +2,7 @@ from keras import Model
 from keras.models import load_model
 from keras_preprocessing.sequence import pad_sequences
 from keras_preprocessing.text import Tokenizer
+from tqdm import tqdm
 
 from FeatureExtract.trainmodel import trainingmodel
 import numpy as np
@@ -19,19 +20,17 @@ def extractfeature(preprocessedfile,
     for line in preprocessread.readlines():
         data.append(line)
 
-    print(len(data))
     print("tokenising..")
     tokenizer = Tokenizer(num_words=max_words)
-    tokenizer.fit_on_texts(data)
-    sequences = tokenizer.texts_to_sequences(data)
-
-    # Padding of data insto sequence
-    print("Padding sequences...")
-    data = pad_sequences(sequences, maxlen=maxsequence)
-    print('Shape of Data Tensor:', data.shape)
-
-    print("Extracting features...")
     model = load_model(modelpath)
-    features = model.predict(data, verbose=1)
-    np.save(featurefilepath, features)
+    storefeat = []
+    for val in tqdm(data):
+        tokenizer.fit_on_texts(val)
+        sequences = tokenizer.texts_to_sequences(val)
+        val = pad_sequences(sequences, maxlen=maxsequence)
+        features = model.predict(val, verbose=0)
+        storefeat.append(features)
+
+    storefeat = np.asarray(storefeat)
+    np.save(featurefilepath, storefeat)
     print("Feature extracted.")
